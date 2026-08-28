@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { getAccentStyles } from '../utils/themeHelpers';
+import { Language } from '../types';
 import {
   Sun,
   Moon,
@@ -8,13 +9,11 @@ import {
   SlidersHorizontal,
   Menu,
   X,
-  ExternalLink,
-  Code2,
-  Sparkles
+  Globe
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { data, theme, toggleTheme, accent, setAccent, setIsResumeOpen, setIsCustomizerOpen } = usePortfolio();
+  const { data, theme, toggleTheme, accent, setAccent, setIsResumeOpen, setIsCustomizerOpen, language, setLanguage, t } = usePortfolio();
   const isDark = theme === 'dark';
   const accentStyles = getAccentStyles(accent, isDark);
 
@@ -23,11 +22,17 @@ export const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState('hero');
 
   const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Experience', href: '#experience' },
-    { name: 'Profiles & Contact', href: '#profiles' },
+    { name: t.nav.about, href: '#about', id: 'about' },
+    { name: t.nav.projects, href: '#projects', id: 'projects' },
+    { name: t.nav.skills, href: '#skills', id: 'skills' },
+    { name: t.nav.experience, href: '#experience', id: 'experience' },
+    { name: t.nav.contact, href: '#profiles', id: 'profiles' },
+  ];
+
+  const languages: { code: Language; label: string; name: string }[] = [
+    { code: 'es', label: 'ES', name: 'Español' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'fr', label: 'FR', name: 'Français' },
   ];
 
   useEffect(() => {
@@ -63,8 +68,8 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  const accents: Array<'orange' | 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber'> = [
-    'orange',
+  const accents: Array<'burgundy' | 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber'> = [
+    'burgundy',
     'indigo',
     'emerald',
     'cyan',
@@ -78,8 +83,8 @@ export const Navbar: React.FC = () => {
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         isScrolled
           ? isDark
-            ? 'bg-[#050505]/90 backdrop-blur-md border-b border-white/10'
-            : 'bg-[#FAFAFA]/90 backdrop-blur-md border-b border-black/10'
+            ? 'bg-[#050505]/95 backdrop-blur-md border-b border-white/10'
+            : 'bg-[#FAFAFA]/95 backdrop-blur-md border-b border-black/10'
           : 'bg-transparent border-b border-white/5'
       }`}
     >
@@ -95,11 +100,11 @@ export const Navbar: React.FC = () => {
             <div
               className={`w-9 h-9 flex items-center justify-center font-mono font-bold text-xs border transition-colors ${
                 isDark
-                  ? 'bg-[#111] border-white/15 text-white group-hover:border-[#FF4E00]'
-                  : 'bg-white border-black/15 text-black group-hover:border-[#FF4E00]'
+                  ? 'bg-[#111] border-white/15 text-white group-hover:border-[#9E1B38]'
+                  : 'bg-white border-black/15 text-black group-hover:border-[#9E1B38]'
               }`}
             >
-              <span className="text-[#FF4E00] font-black">
+              <span className="text-[#9E1B38] font-black">
                 {data.profile.name
                   .split(' ')
                   .map((w) => w[0])
@@ -120,14 +125,13 @@ export const Navbar: React.FC = () => {
           </a>
 
           {/* Desktop Nav Items */}
-          <nav id="desktop-nav" className="hidden lg:flex items-center gap-8 text-xs uppercase tracking-widest font-medium">
+          <nav id="desktop-nav" className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs uppercase tracking-widest font-medium">
             {navLinks.map((link) => {
-              const sectionId = link.href.replace('#', '');
-              const isActive = activeSection === sectionId;
+              const isActive = activeSection === link.id;
               return (
                 <a
-                  key={link.name}
-                  id={`nav-link-${sectionId}`}
+                  key={link.id}
+                  id={`nav-link-${link.id}`}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   className={`transition-colors py-1 relative ${
@@ -136,21 +140,50 @@ export const Navbar: React.FC = () => {
                         ? 'text-white font-bold'
                         : 'text-black font-bold'
                       : isDark
-                      ? 'text-neutral-500 hover:text-white'
-                      : 'text-neutral-500 hover:text-black'
+                      ? 'text-neutral-400 hover:text-white'
+                      : 'text-neutral-600 hover:text-black'
                   }`}
                 >
                   <span>{link.name}</span>
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF4E00]" />
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#9E1B38]" />
                   )}
                 </a>
               );
             })}
           </nav>
 
-          {/* Controls: Theme, Resume, Customizer */}
+          {/* Controls: Language, Theme, Accent, Resume, Customizer */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Language Selector */}
+            <div
+              id="desktop-language-selector"
+              className={`flex items-center border p-0.5 ${
+                isDark ? 'bg-[#111] border-white/15' : 'bg-neutral-100 border-black/15'
+              }`}
+            >
+              {languages.map((lang) => {
+                const isSelected = language === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    id={`lang-btn-${lang.code}`}
+                    onClick={() => setLanguage(lang.code)}
+                    title={lang.name}
+                    className={`px-2 py-1 text-[11px] font-mono font-bold transition-colors ${
+                      isSelected
+                        ? 'bg-[#9E1B38] text-white shadow-sm'
+                        : isDark
+                        ? 'text-neutral-400 hover:text-white'
+                        : 'text-neutral-600 hover:text-black'
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Color Accent Picker */}
             <div className={`flex items-center gap-1.5 px-2 py-1 border ${isDark ? 'bg-[#111] border-white/10' : 'bg-neutral-100 border-black/10'}`}>
               {accents.map((acc) => (
@@ -160,8 +193,8 @@ export const Navbar: React.FC = () => {
                   onClick={() => setAccent(acc)}
                   title={`Set accent color: ${acc}`}
                   className={`w-3.5 h-3.5 rounded-full transition-transform ${
-                    acc === 'orange'
-                      ? 'bg-[#FF4E00]'
+                    acc === 'burgundy'
+                      ? 'bg-[#9E1B38]'
                       : acc === 'indigo'
                       ? 'bg-indigo-500'
                       : acc === 'emerald'
@@ -171,7 +204,7 @@ export const Navbar: React.FC = () => {
                       : acc === 'violet'
                       ? 'bg-purple-500'
                       : 'bg-amber-400'
-                  } ${accent === acc ? 'scale-125 ring-2 ring-white/70' : 'opacity-50 hover:opacity-100'}`}
+                  } ${accent === acc || (acc === 'burgundy' && accent === 'orange') ? 'scale-125 ring-2 ring-white/70' : 'opacity-50 hover:opacity-100'}`}
                 />
               ))}
             </div>
@@ -186,7 +219,7 @@ export const Navbar: React.FC = () => {
                   : 'bg-white border-black/10 text-neutral-700 hover:border-black/30'
               }`}
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              aria-label="Toggle Theme"
+              aria-label={t.nav.switchTheme}
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -201,8 +234,8 @@ export const Navbar: React.FC = () => {
                   : 'bg-transparent border-black/20 text-neutral-800 hover:border-black/50 hover:text-black'
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-[#FF4E00]" />
-              <span>Resume</span>
+              <FileText className="w-3.5 h-3.5 text-[#9E1B38]" />
+              <span>{t.nav.resume}</span>
             </button>
 
             {/* Customize / Personalize Button */}
@@ -211,34 +244,64 @@ export const Navbar: React.FC = () => {
               onClick={() => setIsCustomizerOpen(true)}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-all border ${
                 isDark
-                  ? 'bg-[#FF4E00] text-black border-[#FF4E00] font-bold hover:bg-[#ff6524]'
-                  : 'bg-[#FF4E00] text-white border-[#FF4E00] font-bold hover:bg-[#ff6524]'
+                  ? 'bg-[#9E1B38] text-white border-[#9E1B38] font-bold hover:bg-[#b32548]'
+                  : 'bg-[#9E1B38] text-white border-[#9E1B38] font-bold hover:bg-[#b32548]'
               }`}
               title="Personalize name, bio, links, and projects"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Customize</span>
+              <span>{t.nav.customize}</span>
             </button>
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile controls & hamburger */}
           <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Language Switcher Quick Pill */}
+            <div
+              id="mobile-language-selector"
+              className={`flex items-center border p-0.5 ${
+                isDark ? 'bg-[#111] border-white/15' : 'bg-neutral-100 border-black/15'
+              }`}
+            >
+              {languages.map((lang) => {
+                const isSelected = language === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    id={`mobile-lang-btn-${lang.code}`}
+                    onClick={() => setLanguage(lang.code)}
+                    title={lang.name}
+                    className={`px-1.5 py-0.5 text-[10px] font-mono font-bold transition-colors ${
+                      isSelected
+                        ? 'bg-[#9E1B38] text-white'
+                        : isDark
+                        ? 'text-neutral-400'
+                        : 'text-neutral-600'
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <button
               id="mobile-theme-toggle-btn"
               onClick={toggleTheme}
               className={`p-2 border ${
                 isDark ? 'bg-[#111] border-white/10 text-neutral-300' : 'bg-white border-black/10 text-neutral-700'
               }`}
+              aria-label={t.nav.switchTheme}
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <button
               id="mobile-menu-toggle-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-2 border ${
+              className={`p-2 border min-w-[44px] min-h-[44px] flex items-center justify-center ${
                 isDark ? 'bg-[#111] border-white/10 text-neutral-200' : 'bg-white border-black/10 text-neutral-800'
               }`}
-              aria-label="Toggle Navigation Menu"
+              aria-label={mobileMenuOpen ? t.nav.closeMenu : t.nav.openMenu}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -254,20 +317,46 @@ export const Navbar: React.FC = () => {
             isDark ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-black/10 shadow-xl'
           }`}
         >
+          {/* Mobile Language Selector row */}
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <span className="text-xs font-mono uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-[#9E1B38]" />
+              {t.nav.language}
+            </span>
+            <div className="flex items-center gap-1">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={`px-3 py-1.5 text-xs font-mono font-bold border transition-colors ${
+                    language === lang.code
+                      ? 'bg-[#9E1B38] text-white border-[#9E1B38]'
+                      : isDark
+                      ? 'border-white/10 text-neutral-300'
+                      : 'border-black/10 text-neutral-700'
+                  }`}
+                >
+                  {lang.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="flex flex-col space-y-2">
             {navLinks.map((link) => {
-              const sectionId = link.href.replace('#', '');
-              const isActive = activeSection === sectionId;
+              const isActive = activeSection === link.id;
               return (
                 <a
-                  key={link.name}
-                  id={`mobile-nav-link-${sectionId}`}
+                  key={link.id}
+                  id={`mobile-nav-link-${link.id}`}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`px-3 py-2 text-xs uppercase tracking-widest font-medium border-l-2 ${
+                  className={`px-3 py-2.5 text-xs uppercase tracking-widest font-medium border-l-2 min-h-[44px] flex items-center ${
                     isActive
-                      ? 'border-[#FF4E00] text-white font-bold bg-white/5'
-                      : 'border-transparent text-neutral-400 hover:text-white'
+                      ? 'border-[#9E1B38] text-white font-bold bg-white/5'
+                      : isDark
+                      ? 'border-transparent text-neutral-400 hover:text-white'
+                      : 'border-transparent text-neutral-600 hover:text-black'
                   }`}
                 >
                   {link.name}
@@ -283,10 +372,10 @@ export const Navbar: React.FC = () => {
                 setMobileMenuOpen(false);
                 setIsResumeOpen(true);
               }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-mono uppercase tracking-wider border border-white/20 text-neutral-200"
+              className="w-full flex items-center justify-center gap-2 py-3 text-xs font-mono uppercase tracking-wider border border-white/20 text-neutral-200 min-h-[44px]"
             >
-              <FileText className="w-4 h-4 text-[#FF4E00]" />
-              <span>View Full Resume / CV</span>
+              <FileText className="w-4 h-4 text-[#9E1B38]" />
+              <span>{t.nav.resume}</span>
             </button>
             <button
               id="mobile-customize-btn"
@@ -294,10 +383,10 @@ export const Navbar: React.FC = () => {
                 setMobileMenuOpen(false);
                 setIsCustomizerOpen(true);
               }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-mono uppercase tracking-wider bg-[#FF4E00] text-black font-bold"
+              className="w-full flex items-center justify-center gap-2 py-3 text-xs font-mono uppercase tracking-wider bg-[#9E1B38] text-white font-bold min-h-[44px]"
             >
               <SlidersHorizontal className="w-4 h-4" />
-              <span>Customize Portfolio Information</span>
+              <span>{t.nav.customize}</span>
             </button>
           </div>
         </div>

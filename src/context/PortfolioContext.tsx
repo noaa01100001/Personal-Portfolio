@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { PortfolioData, ProjectItem, ThemeMode, AccentColor } from '../types';
+import { PortfolioData, ProjectItem, ThemeMode, AccentColor, Language } from '../types';
 import { initialPortfolioData } from '../data/portfolioData';
+import { translations, localizedPortfolioData, TranslationStrings } from '../i18n/translations';
 
 interface PortfolioContextType {
   data: PortfolioData;
@@ -18,6 +19,11 @@ interface PortfolioContextType {
   accent: AccentColor;
   setAccent: (accent: AccentColor) => void;
 
+  // Language / i18n
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: TranslationStrings;
+
   // Active Modals & Views
   selectedProject: ProjectItem | null;
   setSelectedProject: (project: ProjectItem | null) => void;
@@ -31,24 +37,39 @@ interface PortfolioContextType {
   showToast: (msg: string) => void;
 }
 
-const STORAGE_KEY = 'ainhoa_castillo_portfolio_v10';
+const STORAGE_KEY = 'ainhoa_castillo_portfolio_v12';
 const THEME_KEY = 'portfolio_theme_mode';
 const ACCENT_KEY = 'portfolio_accent_color';
+const LANG_KEY = 'portfolio_active_language';
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [data, setData] = useState<PortfolioData>(() => {
+  const [language, setLanguageState] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY);
+      if (saved && (saved === 'es' || saved === 'en' || saved === 'fr')) {
+        return saved as Language;
+      }
+    } catch {
+      // ignore
+    }
+    return 'es';
+  });
+
+  const [customData, setCustomData] = useState<Partial<Record<Language, PortfolioData>>>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         return JSON.parse(saved);
       }
     } catch {
-      // Fallback
+      // ignore
     }
-    return initialPortfolioData;
+    return {};
   });
+
+  const activeData: PortfolioData = customData[language] || localizedPortfolioData[language] || initialPortfolioData;
 
   const [theme, setTheme] = useState<ThemeMode>(() => {
     try {
@@ -63,13 +84,14 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [accent, setAccent] = useState<AccentColor>(() => {
     try {
       const saved = localStorage.getItem(ACCENT_KEY);
-      if (saved && ['orange', 'indigo', 'emerald', 'cyan', 'violet', 'amber'].includes(saved)) {
+      if (saved === 'orange') return 'burgundy';
+      if (saved && ['burgundy', 'indigo', 'emerald', 'cyan', 'violet', 'amber'].includes(saved)) {
         return saved as AccentColor;
       }
     } catch {
       // ignore
     }
-    return 'orange';
+    return 'burgundy';
   });
 
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
@@ -77,14 +99,31 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Sync data to localStorage
+  const t = translations[language] || translations.es;
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem(LANG_KEY, lang);
+    } catch {
+      // ignore
+    }
+    const langNames: Record<Language, string> = {
+      es: 'Español',
+      en: 'English',
+      fr: 'Français'
+    };
+    showToast(`${t.nav.language}: ${langNames[lang]}`);
+  };
+
+  // Sync custom data to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customData));
     } catch (e) {
       console.warn('Failed to save portfolio state to localStorage', e);
     }
-  }, [data]);
+  }, [customData]);
 
   // Sync theme
   useEffect(() => {
@@ -127,44 +166,57 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const updateProfile = (profile: PortfolioData['profile']) => {
-    setData(prev => ({ ...prev, profile }));
-    showToast('Profile information updated');
+    setCustomData(prev => ({
+      ...prev,
+      [language]: {
+        ...(prev[language] || localizedPortfolioData[language] || initialPortfolioData),
+        profile
+      }
+    }));
+    showToast(t.toasts.profileSaved);
   };
 
   const updateProjects = (projects: ProjectItem[]) => {
-    setData(prev => ({ ...prev, projects }));
+    setCustomData(prev => ({
+      ...prev,
+      [language]: {
+        ...(prev[language] || localizedPortfolioData[language] || initialPortfolioData),
+        projects
+      }
+    }));
   };
 
   const addProject = (project: ProjectItem) => {
-    setData(prev => ({ ...prev, projects: [project, ...prev.projects] }));
-    showToast(`Added project "${project.title}"`);
+    const current = activeData.projects;
+    updateProjects([project, ...current]);
+    showToast(`${t.toasts.projectAdded}: "${project.title}"`);
   };
 
   const editProject = (updated: ProjectItem) => {
-    setData(prev => ({
-      ...prev,
-      projects: prev.projects.map(p => (p.id === updated.id ? updated : p))
-    }));
-    showToast(`Updated "${updated.title}"`);
+    const current = activeData.projects;
+    updateProjects(current.map(p => (p.id === updated.id ? updated : p)));
+    showToast(`${t.toasts.projectUpdated}: "${updated.title}"`);
   };
 
   const deleteProject = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      projects: prev.projects.filter(p => p.id !== id)
-    }));
-    showToast('Project removed');
+    const current = activeData.projects;
+    updateProjects(current.filter(p => p.id !== id));
+    showToast(t.toasts.projectRemoved);
   };
 
   const resetToDefaults = () => {
-    setData(initialPortfolioData);
-    showToast('Portfolio reset to default template data');
+    setCustomData(prev => {
+      const copy = { ...prev };
+      delete copy[language];
+      return copy;
+    });
+    showToast(t.toasts.resetDone);
   };
 
   return (
     <PortfolioContext.Provider
       value={{
-        data,
+        data: activeData,
         updateProfile,
         updateProjects,
         addProject,
@@ -176,6 +228,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         toggleTheme,
         accent,
         setAccent,
+        language,
+        setLanguage,
+        t,
         selectedProject,
         setSelectedProject,
         isCustomizerOpen,

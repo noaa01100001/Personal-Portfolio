@@ -7,13 +7,12 @@ import {
   ExternalLink,
   Github,
   Layers,
-  Sparkles,
   ArrowUpRight,
   Plus
 } from 'lucide-react';
 
 export const ProjectsSection: React.FC = () => {
-  const { data, theme, accent, setSelectedProject, setIsCustomizerOpen } = usePortfolio();
+  const { data, theme, accent, setSelectedProject, setIsCustomizerOpen, t } = usePortfolio();
   const isDark = theme === 'dark';
   const accentStyles = getAccentStyles(accent, isDark);
 
@@ -21,9 +20,9 @@ export const ProjectsSection: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const categories: { id: ProjectCategory; label: string }[] = [
-    { id: 'all', label: 'All Artifacts' },
-    { id: 'fullstack', label: 'Full-Stack & QA' },
-    { id: 'frontend', label: 'Interfaces & Landings' },
+    { id: 'all', label: t.projects.filterAll },
+    { id: 'fullstack', label: t.projects.filterFullstack },
+    { id: 'frontend', label: t.projects.filterFrontend },
   ];
 
   const filteredProjects = useMemo(() => {
@@ -35,42 +34,42 @@ export const ProjectsSection: React.FC = () => {
         project.title.toLowerCase().includes(query) ||
         project.tagline.toLowerCase().includes(query) ||
         project.description.toLowerCase().includes(query) ||
-        project.tags.some((t) => t.toLowerCase().includes(query));
+        project.tags.some((tag) => tag.toLowerCase().includes(query));
 
       return matchesCategory && matchesSearch;
     });
   }, [data.projects, activeCategory, searchQuery]);
 
   return (
-    <section id="projects" className={`py-24 border-b ${isDark ? 'border-white/10 bg-[#050505]' : 'border-black/10 bg-[#FAFAFA]'}`}>
+    <section id="projects" className={`py-20 md:py-24 border-b ${isDark ? 'border-white/10 bg-[#050505]' : 'border-black/10 bg-[#FAFAFA]'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-8 border-b border-white/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-6 pb-6 sm:pb-8 border-b border-white/10">
           <div>
-            <div className="text-xs font-mono uppercase tracking-[0.35em] text-[#FF4E00] font-bold mb-2">
-              02 // SELECTED ARTIFACTS & SYSTEMS
+            <div className="text-xs font-mono uppercase tracking-[0.35em] text-[#9E1B38] font-bold mb-2">
+              {t.projects.sectionTag}
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight uppercase italic">
-              Production Architectures <br className="hidden sm:inline" />
-              <span className="text-neutral-500">& Interactive Systems</span>
+              {t.projects.title1} <br className="hidden sm:inline" />
+              <span className="text-neutral-500">{t.projects.title2}</span>
             </h2>
           </div>
 
           <button
             id="add-project-trigger-btn"
             onClick={() => setIsCustomizerOpen(true)}
-            className="inline-flex items-center gap-2 h-10 px-4 text-xs font-mono uppercase tracking-wider border border-white/20 hover:border-[#FF4E00] hover:text-[#FF4E00] transition-colors shrink-0"
+            className="inline-flex items-center gap-2 h-10 px-4 text-xs font-mono uppercase tracking-wider border border-white/20 hover:border-[#9E1B38] hover:text-[#9E1B38] transition-colors shrink-0 self-start md:self-auto min-h-[44px]"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Manage Artifacts</span>
+            <span>{t.customizerModal.title.replace('//', '').trim()}</span>
           </button>
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-12">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 sm:mb-12">
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
             {categories.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
@@ -78,9 +77,9 @@ export const ProjectsSection: React.FC = () => {
                   key={cat.id}
                   id={`project-filter-${cat.id}`}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`h-10 px-5 inline-flex items-center justify-center text-xs font-mono uppercase tracking-wider transition-all border whitespace-nowrap ${
+                  className={`h-10 px-4 sm:px-5 inline-flex items-center justify-center text-xs font-mono uppercase tracking-wider transition-all border whitespace-nowrap min-h-[44px] ${
                     isActive
-                      ? 'bg-[#FF4E00] border-[#FF4E00] text-black font-bold'
+                      ? 'bg-[#9E1B38] border-[#9E1B38] text-white font-bold'
                       : isDark
                       ? 'border-white/10 text-neutral-400 hover:text-white hover:border-white/30'
                       : 'border-black/10 text-neutral-600 hover:text-black hover:border-black/30'
@@ -98,10 +97,10 @@ export const ProjectsSection: React.FC = () => {
             <input
               id="project-search-input"
               type="text"
-              placeholder="SEARCH CATALOG //"
+              placeholder={t.projects.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full h-10 pl-10 pr-4 text-xs font-mono border focus:outline-none focus:border-[#FF4E00] uppercase placeholder:text-neutral-600 ${
+              className={`w-full h-11 pl-10 pr-8 text-xs font-mono border focus:outline-none focus:border-[#9E1B38] uppercase placeholder:text-neutral-600 ${
                 isDark
                   ? 'bg-[#0A0A0A] border-white/10 text-white'
                   : 'bg-white border-black/10 text-black'
@@ -110,9 +109,10 @@ export const ProjectsSection: React.FC = () => {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-500 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-500 hover:text-white p-1"
+                aria-label="Clear search query"
               >
-                [X]
+                ✕
               </button>
             )}
           </div>
@@ -124,20 +124,19 @@ export const ProjectsSection: React.FC = () => {
             isDark ? 'bg-[#0A0A0A] border-white/10' : 'bg-neutral-100 border-black/10'
           }`}>
             <Layers className="w-8 h-8 text-neutral-600 mx-auto mb-3" />
-            <h3 className="text-sm font-mono uppercase tracking-widest font-bold">No Records Found</h3>
-            <p className="text-xs text-neutral-500 mt-1 font-mono">Filter yielded 0 results.</p>
+            <h3 className="text-sm font-mono uppercase tracking-widest font-bold">{t.projects.noResults}</h3>
             <button
               onClick={() => {
                 setActiveCategory('all');
                 setSearchQuery('');
               }}
-              className="mt-4 px-4 py-2 text-xs font-mono uppercase bg-[#FF4E00] text-black font-bold"
+              className="mt-4 px-4 py-2.5 text-xs font-mono uppercase bg-[#9E1B38] text-white font-bold min-h-[44px]"
             >
-              Reset Query
+              {t.projects.resetFilters}
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredProjects.map((project, idx) => (
               <div
                 key={project.id}
@@ -150,11 +149,11 @@ export const ProjectsSection: React.FC = () => {
               >
                 {/* Project Image & Index header */}
                 <div>
-                  <div className="p-4 border-b border-white/10 flex items-center justify-between font-mono text-[11px]">
+                  <div className="p-3 sm:p-4 border-b border-white/10 flex items-center justify-between font-mono text-[11px]">
                     <span className="text-neutral-500">
                       INDEX // 00{idx + 1}
                     </span>
-                    <span className="uppercase text-[#FF4E00] font-bold">
+                    <span className="uppercase text-[#9E1B38] font-bold">
                       {project.category}
                     </span>
                   </div>
@@ -170,22 +169,22 @@ export const ProjectsSection: React.FC = () => {
                       referrerPolicy="no-referrer"
                     />
                     {project.featured && (
-                      <span className="absolute top-3 left-3 px-2 py-0.5 text-[10px] font-mono bg-[#FF4E00] text-black font-bold uppercase tracking-wider">
-                        FLAGSHIP
+                      <span className="absolute top-3 left-3 px-2 py-0.5 text-[10px] font-mono bg-[#9E1B38] text-white font-bold uppercase tracking-wider">
+                        {t.projects.featuredTag}
                       </span>
                     )}
                   </div>
                 </div>
 
                 {/* Project Content */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
                     <h3
                       onClick={() => setSelectedProject(project)}
-                      className="text-xl font-bold tracking-tight uppercase italic cursor-pointer group-hover:text-[#FF4E00] transition-colors flex items-center justify-between"
+                      className="text-lg sm:text-xl font-bold tracking-tight uppercase italic cursor-pointer group-hover:text-[#9E1B38] transition-colors flex items-center justify-between gap-2"
                     >
-                      <span>{project.title}</span>
-                      <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-[#FF4E00] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                      <span className="line-clamp-2">{project.title}</span>
+                      <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-[#9E1B38] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
                     </h3>
                     <p className={`text-xs leading-relaxed line-clamp-3 font-light ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
                       {project.description}
@@ -194,8 +193,8 @@ export const ProjectsSection: React.FC = () => {
 
                   {/* Impact Metric Banner */}
                   {project.impactMetric && (
-                    <div className="text-[11px] font-mono text-[#FF4E00] flex items-center gap-1.5 py-1 border-t border-b border-white/5 truncate">
-                      <span>METRIC //</span>
+                    <div className="text-[11px] font-mono text-[#9E1B38] flex items-center gap-1.5 py-1 border-t border-b border-white/5 truncate">
+                      <span className="shrink-0">METRIC //</span>
                       <span className="truncate text-neutral-300">{project.impactMetric}</span>
                     </div>
                   )}
@@ -218,9 +217,9 @@ export const ProjectsSection: React.FC = () => {
                       <button
                         id={`project-details-btn-${project.id}`}
                         onClick={() => setSelectedProject(project)}
-                        className="text-neutral-300 hover:text-[#FF4E00] transition-colors uppercase tracking-wider flex items-center gap-1"
+                        className="text-neutral-300 hover:text-[#9E1B38] transition-colors uppercase tracking-wider flex items-center gap-1 min-h-[44px]"
                       >
-                        [ARCHIVE SPEC]
+                        [{t.projects.viewDossier}]
                       </button>
 
                       <div className="flex items-center gap-3">
@@ -230,7 +229,7 @@ export const ProjectsSection: React.FC = () => {
                             href={project.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 text-neutral-400 hover:text-white transition-colors"
+                            className="p-2 text-neutral-400 hover:text-white transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                             title="View Source Code"
                             aria-label="View Source Code"
                           >
@@ -243,7 +242,7 @@ export const ProjectsSection: React.FC = () => {
                             href={project.liveUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 text-neutral-400 hover:text-[#FF4E00] transition-colors"
+                            className="p-2 text-neutral-400 hover:text-[#9E1B38] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                             title="Launch Live App"
                             aria-label="Launch Live App"
                           >

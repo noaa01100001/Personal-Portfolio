@@ -34,7 +34,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #FF4E00;
+  background: #9E1B38;
 }
 
 /* Light mode adjustments */
@@ -47,5 +47,5 @@
 }
 
 .light ::-webkit-scrollbar-thumb:hover {
-  background: #FF4E00;
+  background: #800020;
 }

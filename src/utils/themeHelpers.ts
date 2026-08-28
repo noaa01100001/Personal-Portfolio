@@ -2,16 +2,17 @@ import { AccentColor } from '../types';
 
 export const getAccentStyles = (accent: AccentColor, isDark: boolean = true) => {
   switch (accent) {
-    case 'orange':
+    case 'burgundy':
+    case 'orange': // fallback/alias to burgundy
       return {
-        badgeBg: isDark ? 'bg-[#FF4E00]/10 text-[#FF4E00] border-[#FF4E00]/30' : 'bg-orange-50 text-[#FF4E00] border-orange-200',
+        badgeBg: isDark ? 'bg-[#9E1B38]/15 text-[#D4375E] border-[#9E1B38]/40' : 'bg-[#9E1B38]/10 text-[#800020] border-[#9E1B38]/30',
         textGradient: isDark ? 'from-white via-[#FAFAFA] to-neutral-400' : 'from-black via-neutral-900 to-neutral-700',
-        primaryBtn: isDark ? 'bg-[#FF4E00] hover:bg-[#ff621e] text-black font-bold uppercase tracking-wider' : 'bg-[#FF4E00] hover:bg-[#ff621e] text-white font-bold uppercase tracking-wider',
+        primaryBtn: isDark ? 'bg-[#9E1B38] hover:bg-[#b32548] text-white font-bold uppercase tracking-wider' : 'bg-[#800020] hover:bg-[#9E1B38] text-white font-bold uppercase tracking-wider',
         secondaryBtn: isDark ? 'bg-white/5 hover:bg-white/10 text-white border-white/20' : 'bg-black/5 hover:bg-black/10 text-black border-black/20',
-        cardGlow: 'hover:border-[#FF4E00]/50',
-        accentBorder: 'border-[#FF4E00]',
-        accentText: 'text-[#FF4E00]',
-        accentRing: 'focus:ring-[#FF4E00]/40',
+        cardGlow: 'hover:border-[#9E1B38]/60',
+        accentBorder: 'border-[#9E1B38]',
+        accentText: isDark ? 'text-[#D4375E]' : 'text-[#800020]',
+        accentRing: 'focus:ring-[#9E1B38]/40',
         tagBg: isDark ? 'bg-white/5 text-neutral-300 border-white/15' : 'bg-black/5 text-neutral-700 border-black/15'
       };
     case 'emerald':

@@ -23,7 +23,7 @@ const ToastNotification: React.FC = () => {
       id="portfolio-toast"
       className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-none bg-[#111] border border-white/20 text-[#FAFAFA] text-xs font-mono shadow-2xl backdrop-blur-md animate-fade-in"
     >
-      <div className="w-2 h-2 rounded-full bg-[#FF4E00] shrink-0" />
+      <div className="w-2 h-2 rounded-full bg-[#9E1B38] shrink-0" />
       <span>{toastMessage}</span>
     </div>
   );

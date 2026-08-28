@@ -101,4 +101,5 @@ export interface PortfolioData {
 }
 
 export type ThemeMode = 'dark' | 'light';
-export type AccentColor = 'orange' | 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber';
+export type AccentColor = 'burgundy' | 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber' | 'orange';
+export type Language = 'es' | 'en' | 'fr';
